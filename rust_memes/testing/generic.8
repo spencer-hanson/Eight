@@ -1,0 +1,123 @@
+
+/*0
+1Multiline
+comment
+*/
+/*1In-line multi-line comment*/
+/*2In-line multi-line comment2
+*///Singleline comment0
+/*
+3In-line multi-line comment3*/ //Single line comment1
+/*4In-line multi-line comment*//*5In-line multi-line comment5*/
+// Single line comment2
+
+let a = 4+1;
+let b=true;
+let c =  "  abcde fg h i   ";//testing
+let d= fmt("a","b");/*String adding*/
+let e = 5+2*3; // should be 11
+let f = 1**2*3/4/5%6+7-8;
+
+
+
+
+let g = e * 2;
+let h = f / g;
+let i = fmt("asdf", 8);
+
+println(fmt("e: ",e));
+println(fmt("f: ", f));
+println(fmt("d: '", d, "'"));
+println(fmt("c: '", c, "'"));
+
+//exit(0);
+
+
+//let bean=Database::csv(123);
+
+/*
+let results = Database::json("results.json");
+let model = Model::new("Iris", Model::Algorithm::LogisticRegression);
+
+let sourceDB = Text::csv::drop_column(sourceDB, -1) // drop results column
+
+-> Importer(sourceDB)
+    > Train(model, sourceDB)
+        > MVCS.upload(model);
+
+->Trigger(Event{MVCS.upload}) {
+    -> model.run(sourceDB)
+        > Exporter{results}($);
+}
+*/
+
+/*
+Importer/Exporter/Trigger/{func}/MVCS/Transform
+
+->func
+-> g {
+    -> f > h
+    -> i > j
+} > k > l > m > n
+*/
+
+/*
+////////////////////
+// Use case 1 - Add
+////////////////////
+
+let a = [1,2,3,4];
+func add(a, b) {
+    return a + b;
+}
+
+// option 1
+-> reduce(add, a) > result
+
+// option 2?
+//list, pair_size, default
+-> pair(a, 2, 0) > add > result
+
+// option 3
+-> add(a.pair_off(2, 0) > result
+-> add(pair_off(2, a, 0)) > result
+
+// option 4
+-> Trigger{"Sum", ll}
+    > el1, el2 in pair_off(ll, 2, 0) {
+        return add(el1, el2)
+    } > {
+        if $.len() == 1 {
+            return $;
+        } else {
+            emit Event{"Sum", $}
+        }
+    }
+
+-> Event{"Sum", a}
+
+///////////////////////
+// Use case 2 - Square
+///////////////////////
+
+let data = [1,2,3,4];
+
+func square(x) {
+    return x**2;
+}
+
+// option 1
+-> map(square, data) > result
+
+// option 2
+-> d in data {
+    return square(d)
+} > result
+
+//////////////////
+// Use case 3 -
+//////////////////
+
+
+
+*/

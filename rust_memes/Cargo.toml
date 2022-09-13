@@ -1,0 +1,19 @@
+[package]
+name = "rust_memes"
+version = "0.1.0"
+authors = ["Spencer Hanson <spencerhanson3141@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+structopt = "0.3.13"
+gotham = "0.6.0"
+futures = "0.3"
+enum_dispatch = "0.3.7"
+bimap = "0.6.1"
+strum = "0.21"
+strum_macros = "0.21"
+log = "0.4"
+regex = "1"
+lazy_static = "1.4.0"

@@ -1,0 +1,58 @@
+env python:3.6 {
+    requirements = [
+        keras==6.0.1
+    ]
+}
+
+register python:3.6::"mystuff.py";
+
+
+let MemeDB = database::mongo("memes");
+let ProcessedMemeDB = database::mongo("memes_processed");
+let PreProcessedDB = database::mongo("memes_preprocessed");
+
+
+->Call(collect_data) {
+    ->Collector(Reddit);
+}
+
+->Trigger(entry: MemeDB.add) {
+    -> Func(MemePreprocess) {
+        -> Model("ImageToText")::process()
+            > Exporter.update(entry)
+    }
+
+    -> Transform(Image.Resize, 800, 800)
+        > Transform(Image.ToArray)
+        > Exporter{ProcessedMemeDB processed}
+        > Trigger(MemePreprocess.finish) {
+            -> Transform(Text.ToVector)
+                > Exporter.update(processed)
+        }
+}
+
+
+->Trigger(OnDemand)
+    > Function(PreprocessSamples) {
+        ->BatchRun PreprocessBatch (
+        ForEach el in DB,
+        Call(Preprocess),
+        PreProcessDB
+        ) Join(100) {
+            ->Transform(Array.VStack)
+        }
+        ->Trigger(Event{BatchComplete.PreprocessBatch}) {
+            ->Event{"PreprocessingFinished"}
+        }
+    }
+
+->Trigger(PreprocessSamples.finish) {
+    ->Importer(DB) > Call(EmbeddingTrain) > Exporter($)
+    > Event{"MVCSModelPush"}
+}
+
+->Trigger(Event{"MVCSModelPush"}) {
+    -> Call(EmbeddingRun) > Exporter($)
+    > Function() {}
+    -> Function(AtTheSameTime) {}
+}
