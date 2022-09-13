@@ -79,7 +79,7 @@ impl<'a> Context<'a> {
             if cur_sym == &Symbols::NewLine || cur_sym == &Symbols::WindowsNewLine {
                 break;
             } else {
-                self.decrement();
+                self.index -= 1;
             }
         }
         self.increment(); // Increment just past the newline to be on the beginning of the next line
@@ -102,8 +102,17 @@ impl<'a> Context<'a> {
     //     }
     // }
 
+    pub fn get_index(&self) -> usize {
+        return self.index;
+    }
+
+    pub fn jump(&mut self, idx: usize) {
+        self.index = idx;
+    }
+
     pub fn get_safe_multiple(&mut self, len: usize) -> Vec<Result<Symbols, String>> {
-        todo!()
+        // Update 9-13-22 probably fixed? but leaving comment for now
+        // todo!()
         // Make sure you remember that after each increment there is whitespace between symbols,
         // and with multiple symbols there will be excess needed to account for
         // get_safe_multiple(2) -> cur:wsp wsp A wsp wsp B
@@ -112,46 +121,48 @@ impl<'a> Context<'a> {
         // could have separate symbol stream for non-whitespace, and map indexes of symbols to indexes in the orig
         // symbol stream, then use orig symbol stream to determine line number
 
-        // let mut gotten_count = 0;
-        // let mut last_found_idx = 0;
-        // let whitesp_syms = Symbols::get_symbols_by_type(SymbolType::Whitespace);
-        // let mut gotten_symbs = Vec::new();
-        // let start_line = self.get_line_no();
-        // let snipp = self.get_snippet();
-        //
-        // while gotten_count != len {
-        //     if self.index + gotten_count >= self.symbols.len() {
-        //         gotten_symbs.push(Err(format!(
-        //             "Reached EOF while looking for non-whitespace token! Started on line {} snippet: '{}'",
-        //             start_line, snipp
-        //         )));
-        //         return gotten_symbs;
-        //     }
-        //
-        //     while self.index + gotten_count < self.symbols.len() {
-        //         let cur_sym = &self.symbols[self.index + gotten_count].clone();
-        //         let mut found_whitespace = false;
-        //
-        //         for sym in &whitesp_syms {
-        //             if cur_sym == sym {
-        //                 // println!("Cur symb {:?} matched whitespace", cur_sym);
-        //                 found_whitespace = true;
-        //                 break;
-        //             }
-        //         }
-        //
-        //         if found_whitespace {
-        //             // println!("Incrementing over whitespace");
-        //             self.increment();
-        //         } else {
-        //             // println!("Returning {:?}", cur_sym);
-        //             gotten_symbs.push(Ok(cur_sym.clone()));
-        //             gotten_count += 1;
-        //         }
-        //     }
-        // }
-        //
-        // return gotten_symbs;
+        let mut gotten_count = 0;
+        let mut last_found_idx = 0;
+        let whitesp_syms = Symbols::get_symbols_by_type(SymbolType::Whitespace);
+        let mut gotten_symbs = Vec::new();
+        let mut whitespace_count = 0;
+
+        let start_line = self.get_line_no();
+        let snipp = self.get_snippet();
+
+        while gotten_count < len {
+            if self.index + whitespace_count + gotten_count >= self.symbols.len() {
+                gotten_symbs.push(Err(format!(
+                    "Reached EOF while looking for non-whitespace token! Started on line {} snippet: '{}'",
+                    start_line, snipp
+                )));
+                return gotten_symbs;
+            }
+
+            while self.index + whitespace_count + gotten_count < self.symbols.len() && gotten_count < len {
+                let cur_sym = &self.symbols[self.index + whitespace_count + gotten_count].clone();
+                let mut found_whitespace = false;
+
+                for sym in &whitesp_syms {
+                    if cur_sym == sym {
+                        // println!("Cur symb {:?} matched whitespace", cur_sym);
+                        found_whitespace = true;
+                        break;
+                    }
+                }
+
+                if found_whitespace {
+                    // println!("Incrementing over whitespace");
+                    whitespace_count += 1;
+                } else {
+                    // println!("Returning {:?}", cur_sym);
+                    gotten_symbs.push(Ok(cur_sym.clone()));
+                    gotten_count += 1;
+                }
+            }
+        }
+
+        return gotten_symbs;
     }
 
     pub fn get_safe(&mut self) -> Result<Symbols, String> {
@@ -186,12 +197,25 @@ impl<'a> Context<'a> {
         return true;
     }
 
-    pub fn decrement(&mut self) {
-        self.index -= 1;
+    pub fn increment_raw(&mut self) {
+        self.index += 1;
     }
 
     pub fn increment(&mut self) {
-        self.index += 1;
+        self.increment_raw();
+        let whitesp_syms = Symbols::get_symbols_by_type(SymbolType::Whitespace);
+        loop {
+            if self.index == self.symbols.len() {
+                return; // EOF reached
+            }
+            for sym in &whitesp_syms {
+                if &self.symbols[self.index].clone() == sym {
+                    self.increment_raw();
+                    break;
+                }
+            }
+            return;
+        }
     }
 
     pub fn get_panic_smessage(&self, msg: String) -> String {

@@ -100,7 +100,7 @@ pub fn parse_exprs(context: &mut Context) -> Vec<Expression> {
                             exprs.push(Expression::VariableTokenExpr(expr));
                         }
                         Err(e) => {
-                            context.decrement();
+                            // context index might be off by one right here, removing decrement()
                             panic!("{}", context.get_panic_smessage(e));
                         }
                     }

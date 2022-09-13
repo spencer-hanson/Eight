@@ -43,6 +43,8 @@ impl ExpressionRelations for Box<Print> {
 
 impl ParsableExpression for Print {
     fn parse<'a, 'c>(context: &'c mut Context) -> Option<Expression> {
+        let idx = context.get_index();
+
         let (name, args) = match parse_function_call(context) {
             Some(n) => n,
             None => {
@@ -52,7 +54,7 @@ impl ParsableExpression for Print {
         println!("IAMHERE");
         context.print_symbols_current();
 
-        if name.eq("println") {
+        if name.eq("println") || name.eq("print") { // TODO differenate between print and println
             match context.get() {
                 Symbols::Semicolon => {
                     context.increment();
@@ -65,6 +67,7 @@ impl ParsableExpression for Print {
                 }
             }
         }
+        context.jump(idx); // jump back to before parsing function call, wrong function found TODO?
         return None;
     }
 }

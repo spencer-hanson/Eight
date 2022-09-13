@@ -61,6 +61,8 @@ impl TypedSecondaryExpression for Box<Format> {
 impl Format {
     //pub fn parse<'a>(context: &mut Context) -> Option<SecondaryExpression>
     pub fn parse<'a, 'c>(context: &'c mut Context) -> Option<SecondaryExpression> {
+        let idx = context.get_index();
+
         let (name, args) = match parse_function_call(context) {
             Some(n) => n,
             None => {
@@ -74,7 +76,7 @@ impl Format {
                     Format { exprs: args.to_vec() }
                 )));
         }
-
+        context.jump(idx); // TODO?
         None
     }
 }

@@ -264,19 +264,19 @@ pub fn partial_parse_secondary_expression<'a>(context: &mut Context) -> Option<V
 
     //Secondary expressions here
 
-    // Parse list expression
-    if !found {
-        debug!("Attempting list expression parse");
-        match ListExpression::parse(context) {
-            Some(s) => {
-                secexpr = Some(s);
-                found = true;
-            },
-            None => {
-                debug!("list expression parse fail");
-            }
-        }
-    }
+    // // Parse list expression TODO List parsing
+    // if !found {
+    //     debug!("Attempting list expression parse");
+    //     match ListExpression::parse(context) {
+    //         Some(s) => {
+    //             secexpr = Some(s);
+    //             found = true;
+    //         },
+    //         None => {
+    //             debug!("list expression parse fail");
+    //         }
+    //     }
+    // }
 
     // Parse fmt function call
     if !found {

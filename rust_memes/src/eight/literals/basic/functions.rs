@@ -64,6 +64,7 @@ pub fn parse_function_call_args<'a>(context: &mut Context) -> FuncArgs {
     loop {
         let secexpr: SecondaryExpression = parse_secondary_expression(context);
         args.push(secexpr);
+        context.print_symbols_current();
 
         match context.get() {
             Symbols::Comma => {
@@ -91,8 +92,9 @@ pub fn parse_function_call_args<'a>(context: &mut Context) -> FuncArgs {
 pub fn parse_function_call<'a>(context: &mut Context) -> Option<(String, FuncArgs)> {
     return match context.get() {
         Symbols::LiteralSymb(func_name) => {
-            match context.get() {
-                Symbols::ParenOpen => {
+
+            match context.get_safe_multiple(2).remove(1) {
+                Ok(Symbols::ParenOpen) => {
                     if !is_varname_valid(func_name.as_str()) {
                         panic!(
                             "{}",
@@ -109,7 +111,7 @@ pub fn parse_function_call<'a>(context: &mut Context) -> Option<(String, FuncArg
                         func_name
                     );
 
-                    context.increment();
+                    context.increment(); // Increment past paren
                     Some((func_name, parse_function_call_args(context)))
                 }
                 _ => {
