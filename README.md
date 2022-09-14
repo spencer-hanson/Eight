@@ -8,3 +8,7 @@ Run with
 ```
 
 ![](./images/helloworld.png)
+
+## Grammar diagram (sorta in progress, mostly done)
+![](./images/grammar.drawio.png)
+
