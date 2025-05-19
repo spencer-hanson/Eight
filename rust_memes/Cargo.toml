@@ -8,7 +8,7 @@ edition = "2018"
 
 [dependencies]
 structopt = "0.3.13"
-gotham = "0.6.0"
+gotham = "0.7.4"
 futures = "0.3"
 enum_dispatch = "0.3.7"
 bimap = "0.6.1"
